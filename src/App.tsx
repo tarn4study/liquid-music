@@ -46,6 +46,28 @@ export default function App() {
     localStorage.setItem("bg_position_y", y.toString());
   };
 
+  // Background horizontal offset position state (persisted)
+  const [bgPositionX, setBgPositionX] = useState<number>(() => {
+    const saved = localStorage.getItem("bg_position_x");
+    return saved !== null ? parseInt(saved, 10) : 50;
+  });
+
+  const changeBgPositionX = (x: number) => {
+    setBgPositionX(x);
+    localStorage.setItem("bg_position_x", x.toString());
+  };
+
+  // Background scale size state (persisted)
+  const [bgScale, setBgScale] = useState<number>(() => {
+    const saved = localStorage.getItem("bg_scale");
+    return saved !== null ? parseInt(saved, 10) : 100;
+  });
+
+  const changeBgScale = (scale: number) => {
+    setBgScale(scale);
+    localStorage.setItem("bg_scale", scale.toString());
+  };
+
   // Liquid thematic active preset gradient state
   const [themeGradient, setThemeGradient] = useState<string>(() => {
     return localStorage.getItem("theme_gradient") || DEFAULT_THEME_GRADIENT;
@@ -127,6 +149,8 @@ export default function App() {
         themeGradient={themeGradient}
         bgImageUrl={activeBgUrl}
         blurEnabled={viewMode !== "ambient"}
+        bgScale={bgScale}
+        bgPositionX={bgPositionX}
         bgPositionY={bgPositionY}
       />
 
@@ -327,6 +351,10 @@ export default function App() {
             setThemeGradient(gradient);
             localStorage.setItem("theme_gradient", gradient);
           }}
+          bgScale={bgScale}
+          onChangeBgScale={changeBgScale}
+          bgPositionX={bgPositionX}
+          onChangeBgPositionX={changeBgPositionX}
           bgPositionY={bgPositionY}
           onChangeBgPositionY={changeBgPositionY}
         />

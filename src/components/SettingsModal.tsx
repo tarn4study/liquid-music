@@ -11,6 +11,10 @@ interface SettingsModalProps {
   currentBgUrl: string | null;
   themeGradient?: string;
   onSelectThemeGradient?: (gradient: string) => void;
+  bgScale: number;
+  onChangeBgScale: (scale: number) => void;
+  bgPositionX: number;
+  onChangeBgPositionX: (x: number) => void;
   bgPositionY: number;
   onChangeBgPositionY: (y: number) => void;
 }
@@ -43,6 +47,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   currentBgUrl,
   themeGradient,
   onSelectThemeGradient,
+  bgScale,
+  onChangeBgScale,
+  bgPositionX,
+  onChangeBgPositionX,
   bgPositionY,
   onChangeBgPositionY,
 }) => {
@@ -369,27 +377,75 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             </div>
           )}
 
-          {/* Background Position Control (only visible when a background image is active) */}
+          {/* Background Image Adjustments (only visible when a background image is active) */}
           {currentBgUrl && (
-            <div className="flex flex-col gap-2 mt-4 border-t border-white/5 pt-4">
-              <div className="flex items-center justify-between text-[11px] font-bold text-cyan-300 tracking-wider uppercase">
-                <span>Background Vertical Offset</span>
-                <span className="text-[10px] text-white/50 font-mono">{bgPositionY}%</span>
+            <div className="flex flex-col gap-3 mt-4 border-t border-white/5 pt-4">
+              <span className="text-[11px] font-bold text-cyan-300 tracking-wider uppercase text-left">
+                Background Fine-Tuning
+              </span>
+
+              {/* 1. Scale Slider */}
+              <div className="flex flex-col gap-1.5">
+                <div className="flex items-center justify-between text-[10px] font-semibold text-white/50">
+                  <span>Image Size (Scale)</span>
+                  <span className="font-mono text-cyan-400/80">{bgScale}%</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className="text-[9px] text-white/30 font-mono">10%</span>
+                  <input
+                    type="range"
+                    min="10"
+                    max="300"
+                    value={bgScale}
+                    onChange={(e) => onChangeBgScale(parseInt(e.target.value, 10))}
+                    className="flex-1 h-1 bg-black/40 rounded-lg appearance-none cursor-pointer accent-cyan-400 border border-white/10"
+                  />
+                  <span className="text-[9px] text-white/30 font-mono">300%</span>
+                </div>
               </div>
-              <div className="flex items-center gap-4">
-                <span className="text-[10px] text-white/40 font-mono">Top</span>
-                <input
-                  type="range"
-                  min="0"
-                  max="100"
-                  value={bgPositionY}
-                  onChange={(e) => onChangeBgPositionY(parseInt(e.target.value, 10))}
-                  className="flex-1 h-1 bg-black/40 rounded-lg appearance-none cursor-pointer accent-cyan-400 border border-white/10"
-                />
-                <span className="text-[10px] text-white/40 font-mono">Bottom</span>
+
+              {/* 2. Position X Slider */}
+              <div className="flex flex-col gap-1.5">
+                <div className="flex items-center justify-between text-[10px] font-semibold text-white/50">
+                  <span>Horizontal Offset (X)</span>
+                  <span className="font-mono text-cyan-400/80">{bgPositionX}%</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className="text-[9px] text-white/30 font-mono">Left</span>
+                  <input
+                    type="range"
+                    min="-100"
+                    max="200"
+                    value={bgPositionX}
+                    onChange={(e) => onChangeBgPositionX(parseInt(e.target.value, 10))}
+                    className="flex-1 h-1 bg-black/40 rounded-lg appearance-none cursor-pointer accent-cyan-400 border border-white/10"
+                  />
+                  <span className="text-[9px] text-white/30 font-mono">Right</span>
+                </div>
               </div>
-              <span className="text-[9px] text-white/35 leading-normal text-left">
-                If your selected background image is cropped vertically (portrait aspect ratio), drag this slider to shift the view.
+
+              {/* 3. Position Y Slider */}
+              <div className="flex flex-col gap-1.5">
+                <div className="flex items-center justify-between text-[10px] font-semibold text-white/50">
+                  <span>Vertical Offset (Y)</span>
+                  <span className="font-mono text-cyan-400/80">{bgPositionY}%</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className="text-[9px] text-white/30 font-mono">Top</span>
+                  <input
+                    type="range"
+                    min="-100"
+                    max="200"
+                    value={bgPositionY}
+                    onChange={(e) => onChangeBgPositionY(parseInt(e.target.value, 10))}
+                    className="flex-1 h-1 bg-black/40 rounded-lg appearance-none cursor-pointer accent-cyan-400 border border-white/10"
+                  />
+                  <span className="text-[9px] text-white/30 font-mono">Bottom</span>
+                </div>
+              </div>
+
+              <span className="text-[9px] text-white/30 leading-normal text-left">
+                Adjust size and offset variables to position your cover art. Since repeating is disabled, the theme gradient will show behind custom boundaries.
               </span>
             </div>
           )}

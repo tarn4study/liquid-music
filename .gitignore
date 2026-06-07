@@ -8,7 +8,7 @@ coverage/
 !.env.example
 .antigravitycli
 .env.example
-server_config.json
+config/
 
 # Ignore custom backgrounds but keep the directory readme
 backgrounds/*

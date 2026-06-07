@@ -9,8 +9,8 @@ services:
     environment:
       - NODE_ENV=production
     volumes:
-      # Persist configuration file so credentials aren't lost on restart
-      - ./server_config.json:/app/server_config.json
+      # Persist configuration directory so credentials aren't lost on restart
+      - ./config:/app/config
       # Mount custom backgrounds folder
       - ./backgrounds:/app/backgrounds
     restart: unless-stopped

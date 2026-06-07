@@ -96,5 +96,5 @@ You can build and deploy this application using the provided Dockerfile and Dock
 
 ## 🔒 Security & Git Practices
 
-- **`server_config.json`**: This file contains your plaintext Navidrome credentials and is automatically ignored by Git inside `.gitignore`.
+- **`config/server_config.json`**: This file contains your plaintext Navidrome credentials and is automatically ignored by Git inside `.gitignore`.
 - **Background Images**: Any images you add to the `backgrounds/` folder for custom styling will not be uploaded to GitHub, protecting your server disk space and privacy. Only the `readme.txt` placeholder is tracked.

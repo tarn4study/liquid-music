@@ -7,8 +7,14 @@ import { createServer as createViteServer } from "vite";
 
 // Set up server constants
 const PORT = 3000;
-const CONFIG_FILE = path.join(process.cwd(), "server_config.json");
+const CONFIG_DIR = path.join(process.cwd(), "config");
+const CONFIG_FILE = path.join(CONFIG_DIR, "server_config.json");
 const DEFAULT_BG_FOLDER = path.join(process.cwd(), "backgrounds");
+
+// Ensure config folder exists
+if (!fs.existsSync(CONFIG_DIR)) {
+  fs.mkdirSync(CONFIG_DIR, { recursive: true });
+}
 
 // Ensure default background folder exists
 if (!fs.existsSync(DEFAULT_BG_FOLDER)) {

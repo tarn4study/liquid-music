@@ -19,10 +19,15 @@ const SHORTCUT_ITEMS = [
 
 export const ShortcutsModal: React.FC<ShortcutsModalProps> = ({ onClose }) => {
   return (
-    <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs animate-fade-in" id="shortcuts-overlay-screen">
-      <div 
+    <div
+      className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs animate-fade-in"
+      id="shortcuts-overlay-screen"
+      onClick={onClose}
+    >
+      <div
         className="w-full max-w-[340px] rounded-3xl border border-white/20 bg-slate-950/85 backdrop-blur-xl text-white shadow-2xl p-5 flex flex-col gap-4 animate-scale-up"
         id="shortcuts-card"
+        onClick={(e) => e.stopPropagation()}
       >
         {/* Header bar */}
         <div className="flex items-center justify-between pb-3 border-b border-white/10" id="shortcuts-header">

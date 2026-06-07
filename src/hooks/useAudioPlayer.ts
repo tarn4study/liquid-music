@@ -123,6 +123,9 @@ export function useAudioPlayer() {
     setTimeout(() => {
       const audio = audioRef.current;
       if (audio) {
+        if (targetSong.url) {
+          audio.src = targetSong.url;
+        }
         audio.load();
         initializeWebAudio();
         if (audioContextRef.current && audioContextRef.current.state === "suspended") {
@@ -335,18 +338,20 @@ export function useAudioPlayer() {
   };
 
   const replaceQueue = (newPlaylist: Song[], autoPlay = false) => {
+    const firstSong = newPlaylist[0] || null;
     setPlayerState((prev) => ({
       ...prev,
       playlist: newPlaylist,
-      currentSong: newPlaylist[0] || null,
+      currentSong: firstSong,
       currentIndex: 0,
       progress: 0,
     }));
 
-    if (autoPlay && newPlaylist.length > 0) {
+    if (autoPlay && firstSong && firstSong.url) {
       setTimeout(() => {
         const audio = audioRef.current;
         if (audio) {
+          audio.src = firstSong.url;
           audio.load();
           initializeWebAudio();
           if (audioContextRef.current && audioContextRef.current.state === "suspended") {

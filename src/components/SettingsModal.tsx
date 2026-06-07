@@ -112,10 +112,15 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in" id="settings-backdrop-container">
-      <div 
+    <div
+      className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in"
+      id="settings-backdrop-container"
+      onClick={onClose}
+    >
+      <div
         className="w-full max-w-[620px] max-h-[85vh] overflow-y-auto rounded-3xl border border-white/20 bg-slate-900/80 backdrop-blur-xl text-white shadow-2xl flex flex-col p-6 animate-scale-up"
         id="settings-overlay-panel"
+        onClick={(e) => e.stopPropagation()}
       >
         {/* Header bar */}
         <div className="flex items-center justify-between pb-4 border-b border-white/10 mb-5">

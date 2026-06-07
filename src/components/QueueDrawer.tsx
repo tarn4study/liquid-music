@@ -29,10 +29,15 @@ export const QueueDrawer: React.FC<QueueDrawerProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-[80] flex justify-end bg-black/40 backdrop-blur-xs animate-fade-in" id="queue-backdrop-screen">
-      <div 
+    <div
+      className="fixed inset-0 z-[80] flex justify-end bg-black/40 backdrop-blur-xs animate-fade-in"
+      id="queue-backdrop-screen"
+      onClick={onClose}
+    >
+      <div
         className="w-full max-w-[380px] h-full border-l border-white/10 bg-slate-950/85 backdrop-blur-2xl text-white shadow-2xl flex flex-col p-5 animate-slide-left"
         id="queue-drawer-panel"
+        onClick={(e) => e.stopPropagation()}
       >
         {/* Header toolbar */}
         <div className="flex items-center justify-between pb-4 border-b border-white/10 mb-4" id="queue-header">

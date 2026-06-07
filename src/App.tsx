@@ -35,6 +35,17 @@ export default function App() {
     }
   };
 
+  // Background vertical offset position state (persisted)
+  const [bgPositionY, setBgPositionY] = useState<number>(() => {
+    const saved = localStorage.getItem("bg_position_y");
+    return saved !== null ? parseInt(saved, 10) : 50;
+  });
+
+  const changeBgPositionY = (y: number) => {
+    setBgPositionY(y);
+    localStorage.setItem("bg_position_y", y.toString());
+  };
+
   // Liquid thematic active preset gradient state
   const [themeGradient, setThemeGradient] = useState<string>(() => {
     return localStorage.getItem("theme_gradient") || DEFAULT_THEME_GRADIENT;
@@ -116,6 +127,7 @@ export default function App() {
         themeGradient={themeGradient}
         bgImageUrl={activeBgUrl}
         blurEnabled={viewMode !== "ambient"}
+        bgPositionY={bgPositionY}
       />
 
       {/* 3. Immersive Center Visualizer Background Rings & Track Details */}
@@ -315,6 +327,8 @@ export default function App() {
             setThemeGradient(gradient);
             localStorage.setItem("theme_gradient", gradient);
           }}
+          bgPositionY={bgPositionY}
+          onChangeBgPositionY={changeBgPositionY}
         />
       )}
 

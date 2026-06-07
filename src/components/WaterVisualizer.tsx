@@ -7,6 +7,7 @@ interface WaterVisualizerProps {
   themeGradient: string; // CSS gradient string
   bgImageUrl: string | null; // Selected background image from scanned folder
   blurEnabled?: boolean; // Toggle blur on background image
+  bgPositionY?: number; // Y-alignment position (0 to 100%)
 }
 
 interface Droplet {
@@ -39,6 +40,7 @@ export const WaterVisualizer: React.FC<WaterVisualizerProps> = ({
   themeGradient,
   bgImageUrl,
   blurEnabled = true,
+  bgPositionY = 50,
 }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -364,7 +366,7 @@ export const WaterVisualizer: React.FC<WaterVisualizerProps> = ({
       style={{
         background: bgImageUrl ? `url(${bgImageUrl})` : undefined,
         backgroundSize: bgImageUrl ? "cover" : undefined,
-        backgroundPosition: bgImageUrl ? "center" : undefined,
+        backgroundPosition: bgImageUrl ? `center ${bgPositionY}%` : undefined,
       }}
       id="water-drop-canvas-wrapper"
     >

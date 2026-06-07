@@ -5,7 +5,7 @@ services:
     build: .
     container_name: glass-water-player
     ports:
-      - "5060:3000"
+      - "6060:3000"
     environment:
       - NODE_ENV=production
     volumes:

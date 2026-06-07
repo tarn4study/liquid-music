@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Song, NavidromeConfig } from "./types";
+import { Song, NavidromeConfig, BackgroundImage } from "./types";
 import { SAMPLE_WATER_LOFI, DEFAULT_THEME_GRADIENT } from "./constants";
 import { useAudioPlayer } from "./hooks/useAudioPlayer";
 import { useNavidrome } from "./hooks/useNavidrome";
@@ -67,6 +67,71 @@ export default function App() {
     setBgScale(scale);
     localStorage.setItem("bg_scale", scale.toString());
   };
+
+  // Scanned backgrounds globally loaded state
+  const [backgroundsList, setBackgroundsList] = useState<BackgroundImage[]>([]);
+  const [scannedFolder, setScannedFolder] = useState<string>("");
+  const [isLoadingImages, setIsLoadingImages] = useState<boolean>(false);
+
+  const fetchBackgroundsList = async () => {
+    setIsLoadingImages(true);
+    try {
+      const response = await fetch("/api/backgrounds");
+      const data = await response.json();
+      if (data.success) {
+        setBackgroundsList(data.files || []);
+        setScannedFolder(data.bgFolder || "");
+      }
+    } catch (e) {
+      console.error("Error loading scanned images:", e);
+    } finally {
+      setIsLoadingImages(false);
+    }
+  };
+
+  const [autoRotateBg, setAutoRotateBg] = useState<boolean>(() => {
+    return localStorage.getItem("auto_rotate_bg") === "true";
+  });
+
+  const changeAutoRotateBg = (val: boolean) => {
+    setAutoRotateBg(val);
+    localStorage.setItem("auto_rotate_bg", val.toString());
+  };
+
+  const [rotateInterval, setRotateInterval] = useState<number>(() => {
+    const saved = localStorage.getItem("rotate_interval");
+    return saved !== null ? parseInt(saved, 10) : 60;
+  });
+
+  const changeRotateInterval = (val: number) => {
+    setRotateInterval(val);
+    localStorage.setItem("rotate_interval", val.toString());
+  };
+
+  // Initial load of background files list
+  useEffect(() => {
+    fetchBackgroundsList();
+  }, []);
+
+  // Background rotation slideshow timer effect
+  useEffect(() => {
+    if (!autoRotateBg || backgroundsList.length <= 1) return;
+
+    const intervalMs = rotateInterval * 1000;
+    const timer = setInterval(() => {
+      const currentIndex = backgroundsList.findIndex((bg) => bg.url === activeBgUrl);
+      let nextIndex = 0;
+      if (currentIndex !== -1) {
+        nextIndex = (currentIndex + 1) % backgroundsList.length;
+      }
+      const nextBg = backgroundsList[nextIndex];
+      if (nextBg) {
+        changeBgUrl(nextBg.url);
+      }
+    }, intervalMs);
+
+    return () => clearInterval(timer);
+  }, [autoRotateBg, rotateInterval, backgroundsList, activeBgUrl]);
 
   // Liquid thematic active preset gradient state
   const [themeGradient, setThemeGradient] = useState<string>(() => {
@@ -357,6 +422,14 @@ export default function App() {
           onChangeBgPositionX={changeBgPositionX}
           bgPositionY={bgPositionY}
           onChangeBgPositionY={changeBgPositionY}
+          backgroundsList={backgroundsList}
+          scannedFolder={scannedFolder}
+          isLoadingImages={isLoadingImages}
+          onRefreshBackgrounds={fetchBackgroundsList}
+          autoRotateBg={autoRotateBg}
+          onChangeAutoRotateBg={changeAutoRotateBg}
+          rotateInterval={rotateInterval}
+          onChangeRotateInterval={changeRotateInterval}
         />
       )}
 

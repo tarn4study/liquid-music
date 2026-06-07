@@ -368,7 +368,7 @@ export const WaterVisualizer: React.FC<WaterVisualizerProps> = ({
       ref={containerRef}
       className="absolute inset-0 w-full h-full overflow-hidden select-none transition-all duration-1000 ease-in-out bg-[#0a0c10]"
       style={{
-        background: bgImageUrl ? `url(${bgImageUrl})` : undefined,
+        backgroundImage: bgImageUrl ? `url(${bgImageUrl})` : undefined,
         backgroundSize: bgImageUrl ? `${bgScale}%` : undefined,
         backgroundPosition: bgImageUrl ? `${bgPositionX}% ${bgPositionY}%` : undefined,
         backgroundRepeat: "no-repeat",

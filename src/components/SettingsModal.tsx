@@ -17,6 +17,15 @@ interface SettingsModalProps {
   onChangeBgPositionX: (x: number) => void;
   bgPositionY: number;
   onChangeBgPositionY: (y: number) => void;
+  // Background rotation & list props
+  backgroundsList: BackgroundImage[];
+  scannedFolder: string;
+  isLoadingImages: boolean;
+  onRefreshBackgrounds: () => void;
+  autoRotateBg: boolean;
+  onChangeAutoRotateBg: (val: boolean) => void;
+  rotateInterval: number;
+  onChangeRotateInterval: (val: number) => void;
 }
 
 const PRESET_GRADIENTS = [
@@ -53,38 +62,29 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   onChangeBgPositionX,
   bgPositionY,
   onChangeBgPositionY,
+  backgroundsList,
+  scannedFolder,
+  isLoadingImages,
+  onRefreshBackgrounds,
+  autoRotateBg,
+  onChangeAutoRotateBg,
+  rotateInterval,
+  onChangeRotateInterval,
 }) => {
   const [serverUrl, setServerUrl] = useState(config.serverUrl);
   const [username, setUsername] = useState(config.username);
   const [password, setPassword] = useState("");
+  const [selectValue, setSelectValue] = useState<string>(() => {
+    const isPreset = [30, 60, 300, 900, 1800, 3600].includes(rotateInterval);
+    return isPreset ? rotateInterval.toString() : "custom";
+  });
   const [backgroundFolder, setBackgroundFolder] = useState(config.backgroundFolder);
   
   const [connectionStatus, setConnectionStatus] = useState<"idle" | "testing" | "success" | "failed">("idle");
   const [connectionError, setConnectionError] = useState<string | null>(null);
-  const [scannedBackgrounds, setScannedBackgrounds] = useState<BackgroundImage[]>([]);
-  const [scannedFolder, setScannedFolder] = useState<string>("");
-  const [isLoadingImages, setIsLoadingImages] = useState<boolean>(false);
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "success">("idle");
 
-  // Load scanned background files on mount/active directory change
-  const fetchScannedImages = async () => {
-    setIsLoadingImages(true);
-    try {
-      const response = await fetch("/api/backgrounds");
-      const data = await response.json();
-      if (data.success) {
-        setScannedBackgrounds(data.files || []);
-        setScannedFolder(data.bgFolder || "");
-      }
-    } catch (e) {
-      console.error("Error loading scanned images:", e);
-    } finally {
-      setIsLoadingImages(false);
-    }
-  };
-
   useEffect(() => {
-    fetchScannedImages();
     testCurrentConnection();
   }, []);
 
@@ -118,7 +118,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
       setSaveStatus("success");
       setTimeout(() => setSaveStatus("idle"), 2000);
       setPassword(""); // Clear input password once persistent server saved
-      fetchScannedImages(); // refresh scanned background folders
+      onRefreshBackgrounds(); // refresh scanned background folders
       testCurrentConnection(); // ping test with new credentials
     }
   };
@@ -338,7 +338,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             <div className="flex justify-center items-center py-8 text-white/50 text-xs gap-2" id="scanned-bg-loader">
               <RefreshCw size={14} className="animate-spin text-cyan-400" /> Scanning folder paths...
             </div>
-          ) : scannedBackgrounds.length === 0 ? (
+          ) : backgroundsList.length === 0 ? (
             <div className="text-center py-6 border border-dashed border-white/10 rounded-2xl bg-black/20 text-white/40 text-xs flex flex-col gap-1.5" id="scanned-bg-empty">
               <span>No image files detected in designated folder path.</span>
               <span className="text-[10px] max-w-[380px] mx-auto text-white/30 leading-snug">
@@ -347,7 +347,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             </div>
           ) : (
             <div className="grid grid-cols-3 sm:grid-cols-4 gap-2.5 max-h-[160px] overflow-y-auto p-1" id="scanned-backgrounds-grid">
-              {scannedBackgrounds.map((bg) => {
+              {backgroundsList.map((bg) => {
                 const isSelected = currentBgUrl === bg.url;
                 return (
                   <button
@@ -376,6 +376,67 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               })}
             </div>
           )}
+
+          {/* Background Rotation Panel (Slideshow) */}
+          <div className="flex flex-col gap-3 mt-4 border-t border-white/5 pt-4">
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] font-bold text-cyan-300 tracking-wider uppercase flex items-center gap-1.5">
+                <span>Automated Slideshow</span>
+              </span>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={autoRotateBg}
+                  onChange={(e) => onChangeAutoRotateBg(e.target.checked)}
+                  className="sr-only peer"
+                />
+                <div className="w-9 h-5 bg-black/40 peer-focus:outline-hidden rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white/40 after:border-white/10 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-cyan-500/30 peer-checked:after:bg-cyan-400" />
+              </label>
+            </div>
+
+            {autoRotateBg && (
+              <div className="grid grid-cols-2 gap-3" id="slideshow-options">
+                <div className="flex flex-col gap-1 text-left">
+                  <label className="text-[10px] text-white/50 font-bold uppercase">Rotation Interval</label>
+                  <select
+                    value={selectValue}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      setSelectValue(val);
+                      if (val !== "custom") {
+                        onChangeRotateInterval(parseInt(val, 10));
+                      }
+                    }}
+                    className="p-1.5 bg-black/40 border border-white/10 rounded-xl text-xs text-white focus:outline-hidden focus:border-cyan-400/50"
+                  >
+                    <option value="30">30 seconds</option>
+                    <option value="60">1 minute</option>
+                    <option value="300">5 minutes</option>
+                    <option value="900">15 minutes</option>
+                    <option value="1800">30 minutes</option>
+                    <option value="3600">60 minutes</option>
+                    <option value="custom">Custom amount...</option>
+                  </select>
+                </div>
+
+                {selectValue === "custom" && (
+                  <div className="flex flex-col gap-1 text-left">
+                    <label className="text-[10px] text-white/50 font-bold uppercase">Custom Seconds</label>
+                    <input
+                      type="number"
+                      min="5"
+                      value={rotateInterval}
+                      onChange={(e) => {
+                        const val = parseInt(e.target.value, 10);
+                        onChangeRotateInterval(isNaN(val) ? 60 : val);
+                      }}
+                      className="p-1.5 bg-black/40 border border-white/10 rounded-xl text-xs text-white focus:outline-hidden focus:border-cyan-400/50"
+                    />
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
 
           {/* Background Image Adjustments (only visible when a background image is active) */}
           {currentBgUrl && (

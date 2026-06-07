@@ -1,0 +1,1 @@
+Place JPG, PNG, WEBP, or SVG images in this folder to be loaded as custom cover art / backgrounds.

@@ -1,0 +1,24 @@
+version: "3.8"
+
+services:
+  glass-water-player:
+    build: .
+    container_name: glass-water-player
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+    volumes:
+      # Persist configuration file so credentials aren't lost on restart
+      - ./server_config.json:/app/server_config.json
+      # Mount custom backgrounds folder
+      - ./backgrounds:/app/backgrounds
+    restart: unless-stopped
+    # If Navidrome container is on the same host, we can connect to its network
+    networks:
+      - navidrome-net
+
+networks:
+  navidrome-net:
+    external: true
+    name: navidrome_default # Replace with your existing Navidrome Docker network name

@@ -1,0 +1,15 @@
+node_modules/
+build/
+dist/
+coverage/
+.DS_Store
+*.log
+.env*
+!.env.example
+.antigravitycli
+.env.example
+server_config.json
+
+# Ignore custom backgrounds but keep the directory readme
+backgrounds/*
+!backgrounds/readme.txt

@@ -1,0 +1,6 @@
+{
+  "name": "Glass & Water Navidrome Player",
+  "description": "Minimalist and fluid music player for Subsonic/Navidrome servers featuring real-time water droplet audio reactive visualizers, custom background folders, and a movable time widget.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

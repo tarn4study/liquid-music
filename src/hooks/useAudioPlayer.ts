@@ -20,7 +20,7 @@ export function useAudioPlayer() {
     tempoSpeed: 1,
   });
 
-  const [zenMode, setZenMode] = useState(false);
+  const [viewMode, setViewMode] = useState<"normal" | "zen" | "ambient">("normal");
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
@@ -316,7 +316,11 @@ export function useAudioPlayer() {
           setPlayerState((prev) => ({ ...prev, isRepeat: !prev.isRepeat }));
           break;
         case "KeyH":
-          setZenMode((prev) => !prev);
+          setViewMode((prev) => {
+            if (prev === "normal") return "zen";
+            if (prev === "zen") return "ambient";
+            return "normal";
+          });
           break;
       }
     };
@@ -403,8 +407,8 @@ export function useAudioPlayer() {
     playerState,
     audioRef,
     audioAnalyser,
-    zenMode,
-    setZenMode,
+    viewMode,
+    setViewMode,
     handlePlayPause,
     handleNextSong,
     handlePreviousSong,

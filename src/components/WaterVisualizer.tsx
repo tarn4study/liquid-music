@@ -6,6 +6,7 @@ interface WaterVisualizerProps {
   tempoSpeed: number; // multiplier for baseline movement
   themeGradient: string; // CSS gradient string
   bgImageUrl: string | null; // Selected background image from scanned folder
+  blurEnabled?: boolean; // Toggle blur on background image
 }
 
 interface Droplet {
@@ -37,6 +38,7 @@ export const WaterVisualizer: React.FC<WaterVisualizerProps> = ({
   tempoSpeed,
   themeGradient,
   bgImageUrl,
+  blurEnabled = true,
 }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -379,7 +381,13 @@ export const WaterVisualizer: React.FC<WaterVisualizerProps> = ({
       )}
 
       {/* Glassmorphism blur frost overlays to merge art beautifully */}
-      <div className="absolute inset-0 bg-black/20 backdrop-blur-[8px] pointer-events-none" id="glass-backdrop-blur" />
+      <div
+        className="absolute inset-0 bg-black/20 pointer-events-none transition-all duration-[1000ms] ease-in-out"
+        style={{
+          backdropFilter: blurEnabled ? "blur(8px)" : "blur(0px)",
+        }}
+        id="glass-backdrop-blur"
+      />
       <div className="absolute inset-0 bg-radial from-transparent via-black/15 to-black/50 pointer-events-none" id="vignette-overlay" />
 
       {/* Interactive Droplet/Ripple Canvas layer */}

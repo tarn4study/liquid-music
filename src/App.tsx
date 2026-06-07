@@ -13,6 +13,7 @@ import { Controller } from "./components/Controller";
 import { LibraryPanel } from "./components/LibraryPanel";
 import { SearchPanel } from "./components/SearchPanel";
 import { CenterImmersiveDisplay } from "./components/CenterImmersiveDisplay";
+import { DraggableModeWidget, ViewMode } from "./components/DraggableModeWidget";
 
 export default function App() {
   // Interface view triggers
@@ -44,8 +45,8 @@ export default function App() {
     playerState,
     audioRef,
     audioAnalyser,
-    zenMode,
-    setZenMode,
+    viewMode,
+    setViewMode,
     handlePlayPause,
     handleNextSong,
     handlePreviousSong,
@@ -114,14 +115,32 @@ export default function App() {
         tempoSpeed={calculateDropletTempo()}
         themeGradient={themeGradient}
         bgImageUrl={activeBgUrl}
+        blurEnabled={viewMode !== "ambient"}
       />
 
       {/* 3. Immersive Center Visualizer Background Rings & Track Details */}
-      <CenterImmersiveDisplay
-        currentSong={playerState.currentSong}
-        isPlaying={playerState.isPlaying}
-        zenMode={zenMode}
-      />
+      {viewMode !== "ambient" && (
+        <CenterImmersiveDisplay
+          currentSong={playerState.currentSong}
+          isPlaying={playerState.isPlaying}
+          zenMode={viewMode === "zen"}
+        />
+      )}
+
+      {/* 3.5. Minimalist Top-Left Song Info for Ambient Mode */}
+      {viewMode === "ambient" && playerState.currentSong && (
+        <div className="absolute top-8 left-8 z-[15] pointer-events-none text-left animate-[fade-in_1s_ease-out_forwards]">
+          <span className="text-white/30 text-[9px] tracking-[0.25em] uppercase font-bold font-display block mb-1">
+            Now Playing
+          </span>
+          <h1 className="text-2xl sm:text-3xl font-light text-white tracking-tight leading-tight mb-1 drop-shadow-md font-display">
+            {playerState.currentSong.title}
+          </h1>
+          <p className="text-cyan-400 text-xs font-semibold tracking-[0.18em] uppercase drop-shadow-sm font-display">
+            {playerState.currentSong.artist}
+          </p>
+        </div>
+      )}
 
       {/* 4. Floating Free Draggable Time & Now Playing Orb */}
       <DraggableTimeWidget
@@ -129,8 +148,14 @@ export default function App() {
         isPlaying={playerState.isPlaying}
       />
 
-      {/* 5. Overlay Heads-Up Displays (HUD) - Hidden when ZenMode is activated */}
-      {!zenMode ? (
+      {/* 4.5. Draggable Display Mode Toggle Widget */}
+      <DraggableModeWidget
+        viewMode={viewMode}
+        onViewModeChange={setViewMode}
+      />
+
+      {/* 5. Overlay Heads-Up Displays (HUD) - Hidden when Zen or Ambient Mode is activated */}
+      {viewMode === "normal" ? (
         <div
           className="absolute inset-0 w-full h-full pointer-events-none flex flex-col z-[10]"
           id="hud-master-frame"
@@ -172,9 +197,9 @@ export default function App() {
             <div className="flex gap-6 bg-white/5 backdrop-blur-md px-6 py-2 rounded-full border border-white/10 shadow-lg items-center">
               <button
                 type="button"
-                onClick={() => setZenMode(false)}
+                onClick={() => setViewMode("normal")}
                 className={`text-[11px] font-semibold tracking-widest transition-colors cursor-pointer ${
-                  !zenMode ? "text-white" : "text-white/40 hover:text-white"
+                  viewMode === "normal" ? "text-white" : "text-white/40 hover:text-white"
                 }`}
               >
                 LIBRARY
@@ -182,7 +207,7 @@ export default function App() {
               <button
                 type="button"
                 onClick={() => {
-                  setZenMode(false);
+                  setViewMode("normal");
                   setIsQueueOpen(true);
                 }}
                 className="text-white/40 hover:text-white text-[11px] font-semibold tracking-widest transition-colors cursor-pointer"
@@ -230,36 +255,38 @@ export default function App() {
           </div>
         </div>
       ) : (
-        // Mini indicator in Zen Mode to escape
+        // Mini indicator in Zen or Ambient Mode to escape
         <button
           type="button"
-          onClick={() => setZenMode(false)}
+          onClick={() => setViewMode("normal")}
           className="absolute top-5 left-1/2 -translate-x-1/2 z-[30] px-4 py-1.5 rounded-full border border-cyan-400/20 bg-slate-950/20 text-cyan-300 text-[10px] font-bold font-sans animate-pulse hover:bg-cyan-500/10 cursor-pointer pointer-events-auto"
           id="escape-zen-btn"
         >
-          Zen Mode Active • Press H or click here to escape
+          {viewMode === "zen" ? "Zen Mode Active" : "Ambient Mode Active"} • Press H or click here to escape
         </button>
       )}
 
       {/* 6. Music Controller floating capsule */}
-      <div className="pointer-events-none w-full" id="controller-deck-frame">
-        <div className="pointer-events-auto" id="controller-deck-wrapper">
-          <Controller
-            playerState={playerState}
-            onPlayPause={handlePlayPause}
-            onNext={handleNextSong}
-            onPrevious={handlePreviousSong}
-            onSeek={handleSeek}
-            onVolumeChange={setVolume}
-            onToggleMute={() => setIsMuted(!playerState.isMuted)}
-            onToggleShuffle={() => setIsShuffle(!playerState.isShuffle)}
-            onToggleRepeat={() => setIsRepeat(!playerState.isRepeat)}
-            onToggleQueue={() => setIsQueueOpen((prev) => !prev)}
-            onToggleSettings={() => setIsSettingsOpen((prev) => !prev)}
-            onToggleShortcuts={() => setIsShortcutsOpen((prev) => !prev)}
-          />
+      {viewMode !== "ambient" && (
+        <div className="pointer-events-none w-full" id="controller-deck-frame">
+          <div className="pointer-events-auto" id="controller-deck-wrapper">
+            <Controller
+              playerState={playerState}
+              onPlayPause={handlePlayPause}
+              onNext={handleNextSong}
+              onPrevious={handlePreviousSong}
+              onSeek={handleSeek}
+              onVolumeChange={setVolume}
+              onToggleMute={() => setIsMuted(!playerState.isMuted)}
+              onToggleShuffle={() => setIsShuffle(!playerState.isShuffle)}
+              onToggleRepeat={() => setIsRepeat(!playerState.isRepeat)}
+              onToggleQueue={() => setIsQueueOpen((prev) => !prev)}
+              onToggleSettings={() => setIsSettingsOpen((prev) => !prev)}
+              onToggleShortcuts={() => setIsShortcutsOpen((prev) => !prev)}
+            />
+          </div>
         </div>
-      </div>
+      )}
 
       {/* 7. Active Play Queue Slide-Out Drawer overlay */}
       {isQueueOpen && (

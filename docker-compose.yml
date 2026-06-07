@@ -5,7 +5,7 @@ services:
     build: .
     container_name: glass-water-player
     ports:
-      - "3000:3000"
+      - "5060:3000"
     environment:
       - NODE_ENV=production
     volumes:
@@ -14,11 +14,3 @@ services:
       # Mount custom backgrounds folder
       - ./backgrounds:/app/backgrounds
     restart: unless-stopped
-    # If Navidrome container is on the same host, we can connect to its network
-    networks:
-      - navidrome-net
-
-networks:
-  navidrome-net:
-    external: true
-    name: navidrome_default # Replace with your existing Navidrome Docker network name
